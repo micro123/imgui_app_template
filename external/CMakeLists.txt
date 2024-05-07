@@ -30,7 +30,7 @@ set(
 )
 add_library(ImGui OBJECT ${IMGUI_FILES})
 target_include_directories(ImGui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/imgui)
-target_link_libraries(ImGui PUBLIC PkgConfig::ft2)
+target_link_libraries(ImGui PUBLIC PkgConfig::ft2 glfw)
 target_compile_definitions(ImGui PUBLIC -DIMGUI_USER_CONFIG="imgui_config_user.h")
 
 # implot
