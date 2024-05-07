@@ -1,0 +1,54 @@
+set(CMAKE_FOLDER "Third Party")
+project(third_party_libs)
+
+# glfw
+set(GLFW_LIBRARY_TYPE "STATIC")
+add_subdirectory(glfw)
+
+# imgui using freetype2
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(ft2 REQUIRED IMPORTED_TARGET freetype2)
+
+# imgui
+set(
+  IMGUI_FILES
+  imgui/imgui_demo.cpp
+  imgui/imgui_draw.cpp
+  imgui/imgui_internal.h
+  imgui/imgui_tables.cpp
+  imgui/imgui_widgets.cpp
+  imgui/imgui.cpp
+  imgui/imgui.h
+  imgui/imstb_rectpack.h
+  imgui/imstb_textedit.h
+  imgui/imstb_truetype.h
+  imgui/backends/imgui_impl_opengl3.h
+  imgui/backends/imgui_impl_opengl3.cpp
+  imgui/backends/imgui_impl_opengl3_loader.h
+  imgui/backends/imgui_impl_glfw.h
+  imgui/backends/imgui_impl_glfw.cpp
+  imgui/misc/cpp/imgui_stdlib.h
+  imgui/misc/cpp/imgui_stdlib.cpp
+  imgui/misc/freetype/imgui_freetype.h
+  imgui/misc/freetype/imgui_freetype.cpp
+)
+add_library(ImGui OBJECT ${IMGUI_FILES})
+target_include_directories(ImGui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/imgui)
+target_link_libraries(ImGui PUBLIC PkgConfig::ft2)
+target_compile_definitions(ImGui PUBLIC -DIMGUI_USER_CONFIG="imgui_config_user.h")
+
+# implot
+set(
+  IMPLOT_FILES
+  implot/implot_demo.cpp
+  implot/implot_internal.h
+  implot/implot_items.cpp
+  implot/implot.cpp
+  implot/implot.h
+)
+add_library(ImPlot OBJECT ${IMPLOT_FILES})
+target_include_directories(ImPlot PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/implot)
+target_link_libraries(ImPlot PUBLIC ImGui)
+
+# fmt
+add_subdirectory(fmt)

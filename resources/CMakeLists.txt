@@ -1,0 +1,19 @@
+set(CMAKE_FOLDER "Assets")
+project(Assets)
+
+set(APP_RES_ROOT_FOLDER ${CMAKE_CURRENT_SOURCE_DIR}/root)
+file(GLOB_RECURSE ALL_RES_FILES ${APP_RES_ROOT_FOLDER}/*.*)
+# message(STATUS "${ALL_RES_FILES}")
+source_group(
+  TREE
+  ${APP_RES_ROOT_FOLDER}
+  FILES ${ALL_RES_FILES}
+)
+add_custom_target(
+  ${PROJECT_NAME}
+  SOURCES ${ALL_RESOURCE_FILES}
+  COMMAND ${CMAKE_COMMAND} -E copy_directory ${APP_RES_ROOT_FOLDER} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets
+)
+
+define_property(TARGET PROPERTY RESOURCE_DIR BRIEF_DOCS "resource root dir" FULL_DOCS "some resources")
+set_property(TARGET ${PROJECT_NAME} PROPERTY RESOURCE_DIR ${APP_RES_ROOT_FOLDER})
