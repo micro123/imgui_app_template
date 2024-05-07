@@ -8,7 +8,7 @@ A template project for `ImGui`.
 - [x] C++ 20
 - [ ] Compiler Support
   - [x] GCC / Clang on Linux
-  - [ ] MSVC on Windows
+  - [x] MSVC on Windows (vs2022+, need vcpkg)
 - [x] GLFW
 - [x] FMT
 - [x] ImGui
@@ -41,7 +41,7 @@ See `src/entry_point.cpp`, just implement all the functions which declared in fi
 
 ## ToDo List
 
-- [ ] Windows MSVC Support
+- [x] Windows MSVC Support
 - [ ] Convert to OOP-Style
 - [ ] And may convert an shared library?
 

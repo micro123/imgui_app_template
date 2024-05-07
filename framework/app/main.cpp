@@ -4,7 +4,7 @@
 #include "imgui.h"
 #include "implot.h"
 #include "misc/freetype/imgui_freetype.h"
-#include "utils/crash_handler.hpp"
+#include "utils/backward.hpp"
 #include <core/log.hpp>
 
 #include <backends/imgui_impl_opengl3.h>
@@ -47,7 +47,7 @@ static void LoadFonts(const std::vector<FontCfg> &cfgs, ImGuiIO &io) {
 
 int main(int argc, const char** argv) {
     // crash handlers
-    system_install_handlers();
+    backward::SignalHandling sh;
 
     L_INFO("Starting...");
 

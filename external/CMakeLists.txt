@@ -5,10 +5,6 @@ project(third_party_libs)
 set(GLFW_LIBRARY_TYPE "STATIC")
 add_subdirectory(glfw)
 
-# imgui using freetype2
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(ft2 REQUIRED IMPORTED_TARGET freetype2)
-
 # imgui
 set(
   IMGUI_FILES

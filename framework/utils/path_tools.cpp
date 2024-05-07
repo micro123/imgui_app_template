@@ -190,7 +190,7 @@ std::string GetAssetsPath(const char* relPath)
 
 std::string GetDataPath(const char* relPath)
 {
-    return fmt::format("{}" PATH_SEPARATOR "data" PATH_SEPARATOR "{}", GetAppDataDirPath(), relPath);
+    return fmt::format("{}" PATH_SEPARATOR "{}", GetAppDataDirPath(), relPath);
 }
 
 std::string GetBinaryPath (const char *relPath)

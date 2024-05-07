@@ -1,6 +1,8 @@
 #ifndef STRING_UTILS_HPP
 #define STRING_UTILS_HPP
 
+#include <map>
+
 #include "config.h"
 #include <vector>
 #include <string>

@@ -1,5 +1,4 @@
 #include "crash_handler.hpp"
-#include <unistd.h>
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
@@ -10,6 +9,7 @@
 #include "utils/subprocess.hpp"
 
 #if __unix__
+#include <unistd.h>
 #include <signal.h>
 #include <execinfo.h>
 #include <linux/limits.h>
@@ -183,6 +183,6 @@ void system_install_handlers()
 #elif _WIN32
 void system_install_handlers()
 {
-    #error "To be implement!!"
+    // #error "To be implement!!"
 }
 #endif

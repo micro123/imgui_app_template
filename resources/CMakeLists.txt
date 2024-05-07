@@ -12,7 +12,7 @@ source_group(
 add_custom_target(
   ${PROJECT_NAME}
   SOURCES ${ALL_RESOURCE_FILES}
-  COMMAND ${CMAKE_COMMAND} -E copy_directory ${APP_RES_ROOT_FOLDER} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets
+  #COMMAND ${CMAKE_COMMAND} -E copy_directory ${APP_RES_ROOT_FOLDER} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets
 )
 
 define_property(TARGET PROPERTY RESOURCE_DIR BRIEF_DOCS "resource root dir" FULL_DOCS "some resources")
