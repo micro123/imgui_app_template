@@ -42,7 +42,7 @@ See `src/entry_point.cpp`, just implement all the functions which declared in fi
 ## ToDo List
 
 - [x] Windows MSVC Support
-- [ ] Convert to OOP-Style
+- [x] Convert to OOP-Style
 - [ ] And may convert an shared library?
 
 
@@ -54,6 +54,5 @@ Some code use opensource libraries, incomplete list:
 - [glfw](https://github.com/glfw/glfw.git)
 - [fmt](https://github.com/fmtlib/fmt.git)
 - [subprocess](https://github.com/arun11299/cpp-subprocess)
-- [proc_maps_parser](https://github.com/ouadev/proc_maps_parser.git)
 - [json](https://github.com/nlohmann/json)
 - [pugixml](https://pugixml.org/)

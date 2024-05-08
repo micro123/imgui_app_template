@@ -1,18 +1,16 @@
-set(CMAKE_FOLDER "Application")
-project(App C CXX)
+set(CMAKE_FOLDER "Framework")
+project(Framework CXX)
 
-file(GLOB_RECURSE APP_SRCS *.*)
+file(GLOB_RECURSE FK_SRCS *.*)
+add_library(${PROJECT_NAME} STATIC ${FK_SRCS})
+target_link_libraries(${PROJECT_NAME} PUBLIC glfw ImGui ImPlot OpenGL::GL fmt)
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable(${PROJECT_NAME} ${APP_SRCS})
-target_link_libraries(${PROJECT_NAME} PRIVATE Framework)
-# add_dependencies(${PROJECT_NAME} Assets)
+# backward-cpp dependencies
+if (UNIX)
+  pkg_check_modules(libunwind REQUIRED IMPORTED_TARGET libunwind)
+  pkg_check_modules(libdw REQUIRED IMPORTED_TARGET libdw)
+  target_compile_definitions(${PROJECT_NAME} PRIVATE -DBACKWARD_HAS_LIBUNWIND=1 -DBACKWARD_HAS_DW=1)
+  target_link_libraries(${PROJECT_NAME} PUBLIC PkgConfig::libunwind PkgConfig::libdw)
+endif()
 
-get_target_property(
-  ASSETS_ROOT_DIR Assets RESOURCE_DIR
-)
-message(STATUS "ASSETS ROOT: ${ASSETS_ROOT_DIR}")
-
-add_custom_target(
-  COPY_APP_RESOURCES ALL
-  COMMAND ${CMAKE_COMMAND} -E copy_directory ${ASSETS_ROOT_DIR} $<TARGET_FILE_DIR:${PROJECT_NAME}>/assets
-)

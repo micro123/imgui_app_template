@@ -78,10 +78,10 @@ set(USE_FOLDERS ON)
 add_subdirectory(external)
 
 # framework
-add_subdirectory(framework)
+add_subdirectory(src)
 
 # resources
 add_subdirectory(resources)
 
-# custom source
-add_subdirectory(src)
+# example
+add_subdirectory(example)
