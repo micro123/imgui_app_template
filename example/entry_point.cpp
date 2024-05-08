@@ -172,7 +172,7 @@ extern void SomeCrashFunction();
 class MyApp final : public Application
 {
 public:
-    MyApp () : Application ("Hello World", 1280, 720, AppWindowFlag_Maximum) {}
+    MyApp () : Application ("Hello World", 1280, 720, AppWindowFlag_Topmost | AppWindowFlag_Frameless | AppWindowFlag_Opacity) {}
 
 protected:
     void Update (double delta, double total) override
@@ -181,6 +181,7 @@ protected:
 
         static bool demo_imgui  = false;
         static bool demo_implot = false;
+        static float rgba[4] {0,0,0,1};
 
         if (Begin ("First Window"))
         {
@@ -191,6 +192,9 @@ protected:
 
             TextUnformatted ("Hello World!");
             TextUnformatted ("我是简体中文！");
+            if (ColorEdit4("Clear Color", rgba)) {
+                SetClearColor(rgba[0], rgba[1], rgba[2], rgba[3]);
+            }
 
             SeparatorText ("Demos");
             Checkbox ("ImGui Demo Window", &demo_imgui);

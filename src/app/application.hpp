@@ -37,6 +37,8 @@ protected:
     virtual void BeforeMainLoop();
     virtual void Update(double delta, double time) = 0;
     virtual void AfterMainLoop();
+
+    void SetClearColor(float r, float g, float b, float a);
 private:
     void Init();
     int Exec();
