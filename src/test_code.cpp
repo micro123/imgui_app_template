@@ -4,7 +4,7 @@ static int ReadPointer(int *ptr) {
 
 static void MakeMeCrash() {
     int *p = nullptr;
-    int y = ReadPointer(p);
+    [[maybe_unused]] int y = ReadPointer(p);
 }
 
 static void NestedFunction() {

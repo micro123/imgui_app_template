@@ -3982,7 +3982,7 @@ public:
   int trace_context_size;
 
   Printer()
-      : snippet(true), color_mode(ColorMode::automatic), address(false),
+      : snippet(false), color_mode(ColorMode::automatic), address(true),
         object(false), inliner_context_size(5), trace_context_size(7) {}
 
   template <typename ST> FILE *print(ST &st, FILE *fp = stderr) {
@@ -4030,8 +4030,11 @@ private:
   void print_stacktrace(ST &st, std::ostream &os, Colorize &colorize) {
     print_header(os, st.thread_id());
     _resolver.load_stacktrace(st);
-    for (size_t trace_idx = st.size(); trace_idx > 0; --trace_idx) {
-      print_trace(os, _resolver.resolve(st[trace_idx - 1]), colorize);
+    // for (size_t trace_idx = st.size(); trace_idx > 0; --trace_idx) {
+    //   print_trace(os, _resolver.resolve(st[trace_idx - 1]), colorize);
+    // }
+    for (size_t trace_idx = 0, size=st.size(); trace_idx < size; ++trace_idx) {
+      print_trace(os, _resolver.resolve(st[trace_idx]), colorize);
     }
   }
 
@@ -4045,7 +4048,7 @@ private:
   }
 
   void print_header(std::ostream &os, size_t thread_id) {
-    os << "Stack trace (most recent call last)";
+    os << "Stack trace (most recent call first)";
     if (thread_id) {
       os << " in thread " << thread_id;
     }
