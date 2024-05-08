@@ -33,6 +33,12 @@ target_include_directories(ImGui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/imgui)
 target_link_libraries(ImGui PUBLIC PkgConfig::ft2 glfw)
 target_compile_definitions(ImGui PUBLIC -DIMGUI_USER_CONFIG="imgui_config_user.h")
 
+source_group(
+  TREE
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  FILES ${IMGUI_FILES}
+)
+
 # implot
 set(
   IMPLOT_FILES
@@ -45,6 +51,12 @@ set(
 add_library(ImPlot OBJECT ${IMPLOT_FILES})
 target_include_directories(ImPlot PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/implot)
 target_link_libraries(ImPlot PUBLIC ImGui)
+
+source_group(
+  TREE
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  FILES ${IMPLOT_FILES}
+)
 
 # fmt
 add_subdirectory(fmt)

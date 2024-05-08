@@ -6,6 +6,13 @@ add_library(${PROJECT_NAME} STATIC ${FK_SRCS})
 target_link_libraries(${PROJECT_NAME} PUBLIC glfw ImGui ImPlot OpenGL::GL fmt)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
+# make tree
+source_group(
+  TREE
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  FILES ${FK_SRCS}
+)
+
 # backward-cpp dependencies
 if (UNIX)
   pkg_check_modules(libunwind REQUIRED IMPORTED_TARGET libunwind)
