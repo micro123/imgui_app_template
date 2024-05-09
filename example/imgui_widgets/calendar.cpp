@@ -170,13 +170,13 @@ void DateEditor::RenderContent (bool popup)
     CircularState month_state;
 
     static const int step = 1;
-    SetNextItemWidth (font_size * 8);
+    SetNextItemWidth (font_size * 8.5f);
     if (InputScalar ("##Year", ImGuiDataType_S32, &display_date_.year, &step, &step, "%d 年"))
     {
         RefreshBuffers ();
     }
     SameLine (0, font_size);
-    SetNextItemWidth (font_size * 8);
+    SetNextItemWidth (font_size * 8.5f);
     if (CircularInt ("##Month", &display_date_.month, 1, 12, 1, 1, "%02d 月", month_state))
     {
         if (month_state == CircularState_Overflow)
@@ -208,7 +208,7 @@ void DateEditor::RenderContent (bool popup)
 
     if (BeginTable ("##DisplayDate", 7, ImGuiTableFlags_NoBordersInBody))
     {
-        auto const item_width = font_size * 3;
+        auto const item_width = font_size * 3.5f;
         TableSetupColumn ("星期日", ImGuiTableColumnFlags_WidthFixed, item_width);
         TableSetupColumn ("星期一", ImGuiTableColumnFlags_WidthFixed, item_width);
         TableSetupColumn ("星期二", ImGuiTableColumnFlags_WidthFixed, item_width);
