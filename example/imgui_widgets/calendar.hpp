@@ -27,10 +27,12 @@ public:
     DateEditor(const char *title_, Date initial_value = Date::Current());
     Date GetSelectedDate() const;
     void Show() const;
-    bool Render();
+    bool RenderAsPopup(bool modal = false);
+    bool RenderAsChild();
 private:
     void SelectToday();
     void RefreshBuffers();
+    void RenderContent(bool popup);
     static bool RenderDateGrid(const DateGrid& dg);
 
     const char* title_;         // 窗口标题

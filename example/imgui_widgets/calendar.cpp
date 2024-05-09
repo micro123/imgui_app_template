@@ -75,7 +75,27 @@ void DateEditor::Show () const
     OpenPopup (popup_id_);
 }
 
-static bool CircularInt (const char *label, int *v, int min, int max, int step, int step_fast, const char *fmt)
+enum CircularState {
+    CircularState_Normal,
+    CircularState_Overflow,
+    CircularState_Underflow,
+};
+
+/**
+ * @brief 循环更改数值，小于最小值时取最大值，并且state改为underflow，大于最大值时取最小值，并且state改为overflow，在取值区间内state为normal
+ * 
+ * @param label 要显示的文本
+ * @param v 数值
+ * @param min 最小值
+ * @param max 最大值
+ * @param step 步进
+ * @param step_fast 快速步进
+ * @param fmt 显示格式
+ * @param state 数值状态
+ * @return true 数值发生更改
+ * @return false 数值未更改
+ */
+static bool CircularInt (const char *label, int *v, int min, int max, int step, int step_fast, const char *fmt, CircularState &state)
 {
     int        v_old   = *v;
     const bool changed = InputScalar (label, ImGuiDataType_S32, &v_old, &step, &step_fast, fmt);
@@ -83,14 +103,17 @@ static bool CircularInt (const char *label, int *v, int min, int max, int step, 
     {
         if (v_old < min)
         {
+            state = CircularState_Underflow;
             *v = max;
         }
         else if (v_old > max)
         {
+            state = CircularState_Overflow;
             *v = min;
         }
         else
         {
+            state = CircularState_Normal;
             *v = v_old;
         }
     }
@@ -106,105 +129,133 @@ static void BulletNote (const char *note_text, ImU32 color)
     TextUnformatted (note_text);
 }
 
-bool DateEditor::Render ()
+bool DateEditor::RenderAsPopup (bool modal)
 {
     accept_ = false;
-    if (BeginPopup (title_, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDecoration))
+    bool opened;
+    if (modal)
     {
-        AlignTextToFramePadding ();
+        opened = BeginPopupModal (title_, nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDecoration);
+    }
+    else
+    {
+        opened = BeginPopup (title_, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDecoration);
+    }
+    if (opened)
+    {
+        RenderContent (true);
+        EndPopup ();
+    }
+    return accept_;
+}
 
-        auto const font_size = GetFontSize ();
+bool DateEditor::RenderAsChild ()
+{
+    accept_     = false;
+    bool opened = BeginChild (popup_id_, ImVec2 (0, 0),
+                              ImGuiChildFlags_FrameStyle | ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_AutoResizeX | ImGuiChildFlags_Border);
+    if (opened)
+    {
+        RenderContent (false);
+    }
+    EndChild ();
+    return accept_;
+}
 
-        static const int step = 1;
-        // TextUnformatted("年："); SameLine();
-        SetNextItemWidth (font_size * 8);
-        if (InputScalar ("##Year", ImGuiDataType_S32, &display_date_.year, &step, &step, "%d 年"))
-        {
-            RefreshBuffers ();
-        }
-        SameLine (0, font_size);
-        // TextUnformatted("月："); SameLine();
-        SetNextItemWidth (font_size * 8);
-        if (CircularInt ("##Month", &display_date_.month, 1, 12, 1, 1, "%02d 月"))
-        {
-            RefreshBuffers ();
-        }
+void DateEditor::RenderContent (bool popup)
+{
+    AlignTextToFramePadding ();
 
-        SameLine (0, font_size);
-        if (Button ("今天"))
-        {
-            SelectToday ();
-        }
+    auto const font_size = GetFontSize ();
+    CircularState month_state;
+
+    static const int step = 1;
+    SetNextItemWidth (font_size * 8);
+    if (InputScalar ("##Year", ImGuiDataType_S32, &display_date_.year, &step, &step, "%d 年"))
+    {
+        RefreshBuffers ();
+    }
+    SameLine (0, font_size);
+    SetNextItemWidth (font_size * 8);
+    if (CircularInt ("##Month", &display_date_.month, 1, 12, 1, 1, "%02d 月", month_state))
+    {
+        if (month_state == CircularState_Overflow)
+            display_date_.year++;
+        else if (month_state == CircularState_Underflow)
+            display_date_.year--;
+        RefreshBuffers ();
+    }
+
+    SameLine (0, font_size);
+    if (Button ("今天"))
+    {
+        SelectToday ();
+        if (!popup)
+            accept_ = true;
+    }
+
+    if (popup)
+    {
         SameLine (0, font_size);
         if (Button ("确定"))
         {
             accept_ = true;
             CloseCurrentPopup ();
         }
-
-        Separator ();
-
-        if (BeginTable ("##DisplayDate", 7, ImGuiTableFlags_NoBordersInBody))
-        {
-            auto const item_width = font_size * 3;
-            TableSetupColumn ("星期日", ImGuiTableColumnFlags_WidthFixed, item_width);
-            TableSetupColumn ("星期一", ImGuiTableColumnFlags_WidthFixed, item_width);
-            TableSetupColumn ("星期二", ImGuiTableColumnFlags_WidthFixed, item_width);
-            TableSetupColumn ("星期三", ImGuiTableColumnFlags_WidthFixed, item_width);
-            TableSetupColumn ("星期四", ImGuiTableColumnFlags_WidthFixed, item_width);
-            TableSetupColumn ("星期五", ImGuiTableColumnFlags_WidthFixed, item_width);
-            TableSetupColumn ("星期六", ImGuiTableColumnFlags_WidthFixed, item_width);
-            TableHeadersRow ();
-
-            bool changed = false;
-            for (int i = 0; i < display_cnt_; ++i)
-            {
-                TableNextColumn ();
-                auto const &g = buffer_[i];
-                PushID (&g);
-                if (RenderDateGrid (g))
-                {
-                    selected_ = g;
-                    changed   = true;
-                }
-                PopID ();
-            }
-            EndTable ();
-
-            if (changed)
-            {
-                // check if display month not equals selected month
-                if (display_date_.month != selected_.month)
-                {
-                    display_date_ = selected_;
-                }
-                RefreshBuffers ();
-            }
-        }
-
-        Separator ();
-
-        BulletNote ("选中日期", COLOR_SELECTED);
-        SameLine (0, font_size);
-        BulletNote ("今天", COLOR_TODAY);
-        SameLine (0, font_size);
-        BulletNote ("X月1日", COLOR_FIRST);
-        SameLine (0, font_size);
-        BulletNote ("其他月份", COLOR_GRAY);
-
-        // PushStyleColor(ImGuiCol_Text, COLOR_SELECTED);
-        // BulletText("选中日期"); SameLine(0, font_size);
-        // PushStyleColor(ImGuiCol_Text, COLOR_TODAY); SameLine(0, font_size);
-        // BulletText("今天");
-        // PushStyleColor(ImGuiCol_Text, COLOR_FIRST); SameLine(0, font_size);
-        // BulletText("某月第一天");
-        // PushStyleColor(ImGuiCol_Text, COLOR_GRAY); SameLine(0, font_size);
-        // BulletText("其他月份");
-        // PopStyleColor(4);
-
-        EndPopup ();
     }
-    return accept_;
+
+    Separator ();
+
+    if (BeginTable ("##DisplayDate", 7, ImGuiTableFlags_NoBordersInBody))
+    {
+        auto const item_width = font_size * 3;
+        TableSetupColumn ("星期日", ImGuiTableColumnFlags_WidthFixed, item_width);
+        TableSetupColumn ("星期一", ImGuiTableColumnFlags_WidthFixed, item_width);
+        TableSetupColumn ("星期二", ImGuiTableColumnFlags_WidthFixed, item_width);
+        TableSetupColumn ("星期三", ImGuiTableColumnFlags_WidthFixed, item_width);
+        TableSetupColumn ("星期四", ImGuiTableColumnFlags_WidthFixed, item_width);
+        TableSetupColumn ("星期五", ImGuiTableColumnFlags_WidthFixed, item_width);
+        TableSetupColumn ("星期六", ImGuiTableColumnFlags_WidthFixed, item_width);
+        TableHeadersRow ();
+
+        bool changed = false;
+        for (int i = 0; i < display_cnt_; ++i)
+        {
+            TableNextColumn ();
+            auto const &g = buffer_[i];
+            PushID (&g);
+            if (RenderDateGrid (g))
+            {
+                selected_ = g;
+                changed   = true;
+            }
+            PopID ();
+        }
+        EndTable ();
+
+        if (changed)
+        {
+            // check if display month not equals selected month
+            if (display_date_.month != selected_.month)
+            {
+                display_date_ = selected_;
+            }
+            RefreshBuffers ();
+
+            if (!popup)
+                accept_ = true;
+        }
+    }
+
+    Separator ();
+
+    BulletNote ("选中日期", COLOR_SELECTED);
+    SameLine (0, font_size);
+    BulletNote ("今天", COLOR_TODAY);
+    SameLine (0, font_size);
+    BulletNote ("X月1日", COLOR_FIRST);
+    SameLine (0, font_size);
+    BulletNote ("其他月份", COLOR_GRAY);
 }
 
 void DateEditor::SelectToday ()
@@ -346,10 +397,10 @@ bool DateEditor::RenderDateGrid (const DateGrid &dg)
     {
         PushStyleColor (ImGuiCol_Button, COLOR_TODAY);
         ++colors;
-    } 
+    }
     else if (dg.day == 1)
     {
-        PushStyleColor(ImGuiCol_Button, COLOR_FIRST);
+        PushStyleColor (ImGuiCol_Button, COLOR_FIRST);
         ++colors;
     }
 

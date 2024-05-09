@@ -51,21 +51,32 @@ protected:
         }
         End ();
 
-        if(Begin("My Widgets"))
+        if(Begin("My Widgets", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
         {
-            static Date date = Date::Current();
-            static DateEditor editor("SomeDay", date);
-            if (editor.Render())
-                date = editor.GetSelectedDate();
+            static bool editor_modal = true;
+            static std::string date_text = Date::Current();
+            static DateEditor  editor_popup("SomeDay");
+
+            if (editor_popup.RenderAsPopup(editor_modal))
+                date_text = editor_popup.GetSelectedDate();
+            Checkbox("使用模态对话框", &editor_modal);
 
             AlignTextToFramePadding();
-
-            Text("Select: %d-%02d-%02d", date.year, date.month, date.day);
+            Text("日期编辑：%s", date_text.c_str());
             SameLine();
-            if (Button ("Edit"))
+            if (Button ("选择"))
             {
-                editor.Show();
+                editor_popup.Show();
             }
+
+            Separator();
+            static std::string date_text2 = Date::Current();
+            static DateEditor  editor_child("AsChild");
+
+            Text("直接编辑：%s", date_text2.c_str());
+            if (editor_child.RenderAsChild())
+                date_text2 = editor_child.GetSelectedDate();
+
         }
         End();
 
