@@ -1,31 +1,36 @@
 #include "calendar.hpp"
 #include <fmt/format.h>
-
+#include <imgui_internal.h>
 #include <chrono>
 #include <ctime>
+#include "imgui.h"
 
-#include <imgui_internal.h>
+#define COLOR_SELECTED IM_COL32 (250, 12, 8, 255)
+#define COLOR_HOVERED IM_COL32 (250, 24, 16, 255)
+#define COLOR_TODAY IM_COL32 (255, 147, 0, 255)
+#define COLOR_GRAY IM_COL32 (104, 104, 104, 255)
+#define COLOR_FIRST IM_COL32 (111, 93, 172, 255)
 
 using namespace ImGui;
 
 Date::operator std::string () const
 {
-    return fmt::format("{}-{:02d}-{:02d}", year, month, day);
+    return fmt::format ("{}-{:02d}-{:02d}", year, month, day);
 }
 
 Date Date::Current ()
 {
-    auto const now = std::chrono::system_clock::now();
-    auto const t = std::chrono::system_clock::to_time_t(now);
+    auto const now = std::chrono::system_clock::now ();
+    auto const t   = std::chrono::system_clock::to_time_t (now);
 
 #if defined(_MSC_VER)
     std::tm tm;
-    (void)localtime_s(&tm, &t);
+    (void) localtime_s (&tm, &t);
 #else
-    std::tm tm = *std::localtime(&t);
+    std::tm tm = *std::localtime (&t);
 #endif
 
-    return { tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday };
+    return {tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday};
 }
 
 enum GridFlag : int
@@ -37,7 +42,7 @@ enum GridFlag : int
 
 void DateEditor::DateGrid::UpdateFlags (const Date &disp, const Date &sel, const Date &today)
 {
-    flags = 0;
+    flags           = 0;
     auto const date = *this;
     if (sel == date)
     {
@@ -53,11 +58,11 @@ void DateEditor::DateGrid::UpdateFlags (const Date &disp, const Date &sel, const
     }
 }
 
-DateEditor::DateEditor (const char *title_, Date initial_value): title_ (title_), display_date_ (initial_value), selected_ (initial_value)
+DateEditor::DateEditor (const char *title_, Date initial_value) : title_ (title_), display_date_ (initial_value), selected_ (initial_value)
 {
-    popup_id_ = GetID(title_);
-    memset(buffer_, 0, sizeof(buffer_));
-    RefreshBuffers();
+    popup_id_ = GetID (title_);
+    memset (buffer_, 0, sizeof (buffer_));
+    RefreshBuffers ();
 }
 
 Date DateEditor::GetSelectedDate () const
@@ -67,16 +72,16 @@ Date DateEditor::GetSelectedDate () const
 
 void DateEditor::Show () const
 {
-    OpenPopup(popup_id_);
+    OpenPopup (popup_id_);
 }
 
-static bool CircularInt(const char *label, int *v, int min, int max, int step, int step_fast)
+static bool CircularInt (const char *label, int *v, int min, int max, int step, int step_fast, const char *fmt)
 {
     int        v_old   = *v;
-    const bool changed = InputInt(label, &v_old, step, step_fast);
+    const bool changed = InputScalar (label, ImGuiDataType_S32, &v_old, &step, &step_fast, fmt);
     if (changed)
     {
-        if(v_old < min)
+        if (v_old < min)
         {
             *v = max;
         }
@@ -92,67 +97,79 @@ static bool CircularInt(const char *label, int *v, int min, int max, int step, i
     return changed;
 }
 
+static void BulletNote (const char *note_text, ImU32 color)
+{
+    PushStyleColor (ImGuiCol_Text, color);
+    Bullet ();
+    PopStyleColor ();
+    SameLine ();
+    TextUnformatted (note_text);
+}
+
 bool DateEditor::Render ()
 {
     accept_ = false;
-    if (BeginPopup(title_, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDecoration))
+    if (BeginPopup (title_, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDecoration))
     {
-        AlignTextToFramePadding();
+        AlignTextToFramePadding ();
 
-        auto const font_size = GetFontSize();
+        auto const font_size = GetFontSize ();
 
-        TextUnformatted("年："); SameLine();
-        SetNextItemWidth(font_size * 8);
-        if (InputInt ("##Year", &display_date_.year, 1, 1))
+        static const int step = 1;
+        // TextUnformatted("年："); SameLine();
+        SetNextItemWidth (font_size * 8);
+        if (InputScalar ("##Year", ImGuiDataType_S32, &display_date_.year, &step, &step, "%d 年"))
         {
-            RefreshBuffers();
+            RefreshBuffers ();
         }
-        SameLine();
-        TextUnformatted("月："); SameLine();
-        SetNextItemWidth(font_size * 8);
-        if (CircularInt ("##Month", &display_date_.month, 1, 12, 1, 1))
+        SameLine (0, font_size);
+        // TextUnformatted("月："); SameLine();
+        SetNextItemWidth (font_size * 8);
+        if (CircularInt ("##Month", &display_date_.month, 1, 12, 1, 1, "%02d 月"))
         {
-            RefreshBuffers();
+            RefreshBuffers ();
         }
 
-        SameLine(0, font_size);
+        SameLine (0, font_size);
         if (Button ("今天"))
         {
-            SelectToday();
+            SelectToday ();
         }
-        SameLine(0, font_size);
+        SameLine (0, font_size);
         if (Button ("确定"))
         {
             accept_ = true;
-            CloseCurrentPopup();
+            CloseCurrentPopup ();
         }
 
-        if (BeginTable ("##DisplayDate", 7, ImGuiTableFlags_Borders))
+        Separator ();
+
+        if (BeginTable ("##DisplayDate", 7, ImGuiTableFlags_NoBordersInBody))
         {
-            auto const item_width = font_size * 4;
-            TableSetupColumn("星期日", ImGuiTableColumnFlags_WidthFixed, item_width);
-            TableSetupColumn("星期一", ImGuiTableColumnFlags_WidthFixed, item_width);
-            TableSetupColumn("星期二", ImGuiTableColumnFlags_WidthFixed, item_width);
-            TableSetupColumn("星期三", ImGuiTableColumnFlags_WidthFixed, item_width);
-            TableSetupColumn("星期四", ImGuiTableColumnFlags_WidthFixed, item_width);
-            TableSetupColumn("星期五", ImGuiTableColumnFlags_WidthFixed, item_width);
-            TableSetupColumn("星期六", ImGuiTableColumnFlags_WidthFixed, item_width);
-            TableHeadersRow();
+            auto const item_width = font_size * 3;
+            TableSetupColumn ("星期日", ImGuiTableColumnFlags_WidthFixed, item_width);
+            TableSetupColumn ("星期一", ImGuiTableColumnFlags_WidthFixed, item_width);
+            TableSetupColumn ("星期二", ImGuiTableColumnFlags_WidthFixed, item_width);
+            TableSetupColumn ("星期三", ImGuiTableColumnFlags_WidthFixed, item_width);
+            TableSetupColumn ("星期四", ImGuiTableColumnFlags_WidthFixed, item_width);
+            TableSetupColumn ("星期五", ImGuiTableColumnFlags_WidthFixed, item_width);
+            TableSetupColumn ("星期六", ImGuiTableColumnFlags_WidthFixed, item_width);
+            TableHeadersRow ();
 
             bool changed = false;
-            for (size_t i=0; i<std::size(buffer_); ++i)
+            for (int i = 0; i < display_cnt_; ++i)
             {
-                TableNextColumn();
-                auto const& g = buffer_[i];
-                PushID(&g);
-                if (RenderDateGrid(g))
+                TableNextColumn ();
+                auto const &g = buffer_[i];
+                PushID (&g);
+                if (RenderDateGrid (g))
                 {
                     selected_ = g;
-                    changed = true;
+                    changed   = true;
                 }
-                PopID();
+                PopID ();
             }
-            EndTable();
+            EndTable ();
 
             if (changed)
             {
@@ -161,33 +178,53 @@ bool DateEditor::Render ()
                 {
                     display_date_ = selected_;
                 }
-                RefreshBuffers();
+                RefreshBuffers ();
             }
         }
 
-        EndPopup();
+        Separator ();
+
+        BulletNote ("选中日期", COLOR_SELECTED);
+        SameLine (0, font_size);
+        BulletNote ("今天", COLOR_TODAY);
+        SameLine (0, font_size);
+        BulletNote ("X月1日", COLOR_FIRST);
+        SameLine (0, font_size);
+        BulletNote ("其他月份", COLOR_GRAY);
+
+        // PushStyleColor(ImGuiCol_Text, COLOR_SELECTED);
+        // BulletText("选中日期"); SameLine(0, font_size);
+        // PushStyleColor(ImGuiCol_Text, COLOR_TODAY); SameLine(0, font_size);
+        // BulletText("今天");
+        // PushStyleColor(ImGuiCol_Text, COLOR_FIRST); SameLine(0, font_size);
+        // BulletText("某月第一天");
+        // PushStyleColor(ImGuiCol_Text, COLOR_GRAY); SameLine(0, font_size);
+        // BulletText("其他月份");
+        // PopStyleColor(4);
+
+        EndPopup ();
     }
     return accept_;
 }
 
 void DateEditor::SelectToday ()
 {
-    display_date_ = selected_ = Date::Current();
-    RefreshBuffers();
+    display_date_ = selected_ = Date::Current ();
+    RefreshBuffers ();
 }
 
-static std::tm from_ymd(int y, int m, int d)
+static std::tm from_ymd (int y, int m, int d)
 {
-    std::tm tm{};
-    tm.tm_year = y - 1900;
-    tm.tm_mon = m - 1;
-    tm.tm_mday = d;
-    std::time_t t = std::mktime(&tm);
+    std::tm tm {};
+    tm.tm_year    = y - 1900;
+    tm.tm_mon     = m - 1;
+    tm.tm_mday    = d;
+    std::time_t t = std::mktime (&tm);
 
 #if defined(_MSC_VER)
-    (void)localtime_s(&tm, &t);
+    (void) localtime_s (&tm, &t);
 #else
-    tm = *std::localtime(&t);
+    tm = *std::localtime (&t);
 #endif
 
     tm.tm_year += 1900;
@@ -196,7 +233,7 @@ static std::tm from_ymd(int y, int m, int d)
     return tm;
 }
 
-static int CircularInc(int v, int min, int max)
+static int CircularInc (int v, int min, int max)
 {
     if (v == max)
         v = min;
@@ -204,7 +241,7 @@ static int CircularInc(int v, int min, int max)
         ++v;
     return v;
 }
-static int CircularDec(int v, int min, int max)
+static int CircularDec (int v, int min, int max)
 {
     if (v == min)
         v = max;
@@ -213,73 +250,74 @@ static int CircularDec(int v, int min, int max)
     return v;
 }
 
-constexpr int month_days[]{
-    0,0,   // padding
-    31,31, // 1
-    28,29, // 2
-    31,31, // 3
-    30,30, // 4
-    31,31, // 5
-    30,30, // 6
-    31,31, // 7
-    31,31, // 8
-    30,30, // 9
-    31,31, // 10
-    30,30, // 11
-    31,31, // 12
+constexpr int month_days[] {
+        0,  0,   // padding
+        31, 31,  // 1
+        28, 29,  // 2
+        31, 31,  // 3
+        30, 30,  // 4
+        31, 31,  // 5
+        30, 30,  // 6
+        31, 31,  // 7
+        31, 31,  // 8
+        30, 30,  // 9
+        31, 31,  // 10
+        30, 30,  // 11
+        31, 31,  // 12
 };
 
-static int GetMonthDays(int y, int m)
+static int GetMonthDays (int y, int m)
 {
-    int const is_leap = y % 4 == 0 && y % 100 != 0 || y % 400 == 0;
+    int const is_leap = (y % 4 == 0 && y % 100 != 0) || y % 400 == 0;
     return month_days[m * 2 + is_leap];
 }
 
 void DateEditor::RefreshBuffers ()
 {
     // fill buffers by display_date_.{year,month}
-    auto first = from_ymd(display_date_.year, display_date_.month, 1);
-    int fill_y, fill_m, fill_d;
-    auto pb = buffer_;
-    auto const pe = pb + std::size(buffer_);
-    auto const today = Date::Current();
+    auto first   = from_ymd (display_date_.year, display_date_.month, 1);
+    display_cnt_ = first.tm_wday + GetMonthDays (display_date_.year, display_date_.month) > 35 ? std::size (buffer_) : 35;
+    int        fill_y, fill_m, fill_d;
+    auto       pb    = buffer_;
+    auto const pe    = pb + display_cnt_;
+    auto const today = Date::Current ();
 
     // 上个月
-    fill_m = CircularDec(display_date_.month, 1, 12);
+    fill_m = CircularDec (display_date_.month, 1, 12);
     fill_y = display_date_.year - static_cast<int> (fill_m == 12);
-    fill_d = GetMonthDays(fill_y, fill_m) - first.tm_wday + 1;
-    for (int i=0; i<first.tm_wday; ++i)
+    fill_d = GetMonthDays (fill_y, fill_m) - first.tm_wday + 1;
+    for (int i = 0; i < first.tm_wday; ++i)
     {
-        pb->year = fill_y;
+        pb->year  = fill_y;
         pb->month = fill_m;
-        pb->day = fill_d++;
-        pb->UpdateFlags(display_date_, selected_, today);
+        pb->day   = fill_d++;
+        pb->UpdateFlags (display_date_, selected_, today);
         ++pb;
     }
-    
+
     // 当前月
     fill_y = display_date_.year;
     fill_m = display_date_.month;
     fill_d = 1;
-    for (int i=0, max = GetMonthDays (fill_y, fill_m); i<max; ++i)
+    for (int i = 0, max = GetMonthDays (fill_y, fill_m); i < max; ++i)
     {
-        pb->year = fill_y;
+        pb->year  = fill_y;
         pb->month = fill_m;
-        pb->day = fill_d++;
-        pb->UpdateFlags(display_date_, selected_, today);
+        pb->day   = fill_d++;
+        pb->UpdateFlags (display_date_, selected_, today);
         ++pb;
     }
 
     // 下个月
     fill_m = CircularInc (display_date_.month, 1, 12);
-    fill_y = display_date_.year + static_cast<int>(fill_m == 1);
+    fill_y = display_date_.year + static_cast<int> (fill_m == 1);
     fill_d = 1;
-    while(pb < pe)
+    while (pb < pe)
     {
-        pb->year = fill_y;
+        pb->year  = fill_y;
         pb->month = fill_m;
-        pb->day = fill_d++;
-        pb->UpdateFlags(display_date_, selected_, today);
+        pb->day   = fill_d++;
+        pb->UpdateFlags (display_date_, selected_, today);
         ++pb;
     }
 }
@@ -290,29 +328,41 @@ bool DateEditor::RenderDateGrid (const DateGrid &dg)
 
     // styles
     int colors = 2;
-    PushStyleColor(ImGuiCol_ButtonActive, GetStyleColorVec4(ImGuiCol_Button));
-    PushStyleColor(ImGuiCol_ButtonHovered, IM_COL32 (250, 24, 16, 255));
+    PushStyleColor (ImGuiCol_ButtonActive, GetStyleColorVec4 (ImGuiCol_Button));
+    PushStyleColor (ImGuiCol_ButtonHovered, COLOR_HOVERED);
+    PushStyleVar (ImGuiStyleVar_FrameRounding, 0.f);
+    PushStyleVar (ImGuiStyleVar_WindowPadding, ImVec2 (0, 0));
     if (dg.flags & GridFlag_GrayOut)
     {
-        PushStyleColor(ImGuiCol_Button, IM_COL32(104, 104, 104, 255));
+        PushStyleColor (ImGuiCol_Button, COLOR_GRAY);
         ++colors;
     }
     if (dg.flags & GridFlag_Selected)
     {
-        PushStyleColor(ImGuiCol_Button, IM_COL32(250, 12, 8, 255));
+        PushStyleColor (ImGuiCol_Button, COLOR_SELECTED);
         ++colors;
     }
     else if (dg.flags & GridFlag_Today)
     {
-        PushStyleColor(ImGuiCol_Button, IM_COL32(255, 147, 0, 255));
+        PushStyleColor (ImGuiCol_Button, COLOR_TODAY);
+        ++colors;
+    } 
+    else if (dg.day == 1)
+    {
+        PushStyleColor(ImGuiCol_Button, COLOR_FIRST);
         ++colors;
     }
 
     if (dg.day == 1)
-        (void)snprintf(buffer, sizeof(buffer), "%02d月", dg.month);
+    {
+        (void) snprintf (buffer, sizeof (buffer), "%02d月", dg.month);
+    }
     else
-        (void)snprintf(buffer, sizeof(buffer), "%02d日", dg.day);
-    const bool clicked = Button(buffer);
-    PopStyleColor(colors);
+    {
+        (void) snprintf (buffer, sizeof (buffer), "%02d日", dg.day);
+    }
+    const bool clicked = Button (buffer);
+    PopStyleVar (2);
+    PopStyleColor (colors);
     return clicked;
 }

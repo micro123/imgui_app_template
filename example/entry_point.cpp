@@ -88,7 +88,7 @@ protected:
 
         FontCfg cfg;
         cfg.name      = "Default Font";
-        cfg.size      = 18.0f;
+        cfg.size      = 14.0f;
         cfg.bold      = 0;
         cfg.sub_fonts = {
                 {FA_RANGE, "fonts/fa-solid-900.ttf"_AP},

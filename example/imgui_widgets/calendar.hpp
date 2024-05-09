@@ -38,6 +38,7 @@ private:
     Date        selected_;      // 选中的日期
     ImGuiID     popup_id_;      // 内部用
     DateGrid    buffer_[7*6];   // 日期信息
+    int         display_cnt_;   // 需要显示多少个格子
     bool        accept_;        // 点击了确定
 };
 
