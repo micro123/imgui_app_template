@@ -38,6 +38,7 @@ static PROCESS_INFORMATION start_process (const std::string &cmd, const std::vec
 #include <sys/stat.h>
 #include <unistd.h>
 #include <atomic>
+#include <algorithm>
 #include <csignal>
 #include <cstring>
 

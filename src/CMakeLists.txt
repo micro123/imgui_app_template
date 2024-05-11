@@ -2,8 +2,15 @@ set(CMAKE_FOLDER "Framework")
 project(Framework CXX)
 
 file(GLOB_RECURSE FK_SRCS *.*)
-add_library(${PROJECT_NAME} STATIC ${FK_SRCS})
-target_link_libraries(${PROJECT_NAME} PUBLIC glfw ImGui ImPlot OpenGL::GL fmt)
+if (FW_BUILD_SHARED_LIBS)
+  add_library(${PROJECT_NAME} SHARED ${FK_SRCS})
+  target_compile_definitions(${PROJECT_NAME} PRIVATE -DFW_BUILD)
+else()
+  add_library(${PROJECT_NAME} STATIC ${FK_SRCS})
+  target_compile_definitions(${PROJECT_NAME} PRIVATE -DFW_STATIC)
+endif()
+target_link_libraries(${PROJECT_NAME} PRIVATE glfw OpenGL::GL)
+target_link_libraries(${PROJECT_NAME} PUBLIC ImGui ImPlot fmt)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # make tree

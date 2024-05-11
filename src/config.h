@@ -1,6 +1,7 @@
 #ifndef FW_CONFIG_H
 #define FW_CONFIG_H
 
+#include "fw_export.h"
 #include <cstdint>
 
 #define S(n) using s##n = int##n##_t

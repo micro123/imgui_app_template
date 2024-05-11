@@ -2,6 +2,7 @@
 #define APPLICATION_HPP
 
 #include "config.h"
+#include "fw_export.h"
 #include "imgui.h"
 #include "font_config.hpp"
 
@@ -22,7 +23,7 @@ enum AppWindowFlag: u32 {
 
 extern int main_proc();
 
-class Application {
+class FW_API Application {
 public:
     virtual ~Application();
     void Exit(int code);
@@ -51,6 +52,7 @@ using UniqueApp = std::unique_ptr<Application>;
 #define App (Application::Instance())
 
 // Must Implement by user
+API_EXPORT
 UniqueApp CreateApplication();
 
 #endif /* APPLICATION_HPP */

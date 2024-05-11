@@ -7,7 +7,7 @@ int main_proc() {
     return app->Exec();
 }
 
-int main() {
+int FW_API main() {
     backward::SignalHandling sh;
     return main_proc();
 }

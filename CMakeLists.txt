@@ -74,6 +74,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 # use folders
 set(USE_FOLDERS ON)
 
+option(FW_BUILD_SHARED_LIBS "Build Shared Library" ON)
+
 # third party libs
 add_subdirectory(external)
 
