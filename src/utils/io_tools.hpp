@@ -6,11 +6,11 @@
 #include <cstring>
 #include <vector>
 
- std::string ReadTextFile(const std::string& path);
+FW_API std::string ReadTextFile(const std::string& path);
 
- std::vector<u8> ReadBinaryFile(const std::string &path);
+FW_API std::vector<u8> ReadBinaryFile(const std::string &path);
 
- std::vector<u8> EncryptContent(const void *dat, u32 size, const u8 (&key)[32]);
+FW_API std::vector<u8> EncryptContent(const void *dat, u32 size, const u8 (&key)[32]);
 
 inline std::vector<u8> EncryptContent(const void *dat, u32 size, const void *key_data) {
     u8 key[32] {};
@@ -18,7 +18,7 @@ inline std::vector<u8> EncryptContent(const void *dat, u32 size, const void *key
     return EncryptContent(dat, size, key);
 }
 
- std::vector<u8> ReadEncryptedFile(const std::string &path, const u8 (&key)[32]);
+FW_API std::vector<u8> ReadEncryptedFile(const std::string &path, const u8 (&key)[32]);
 
 inline std::vector<u8> ReadEncryptedFile(const std::string &path, const void *key_data) {
     u8 key[32] {};

@@ -2,8 +2,9 @@
 #define ASSET_UTIL_H
 
 #include "config.h"
+#include "fw_export.h"
 #include <vector>
 
- std::vector<unsigned char> asset_content(const char *asset_id);
+FW_API std::vector<unsigned char> asset_content(const char *asset_id);
 
 #endif /* ASSET_UTIL_H */

@@ -1,16 +1,18 @@
 #ifndef PROC_UTILS_HPP
 #define PROC_UTILS_HPP
 
+#include "config.h"
 #include <cstdint>
 #include <functional>
 #include <string>
 
+FW_API
 uint32_t GetProcessId ();
 
-
+FW_API
 uint32_t GetParentProcessId ();
 
-class  Process final
+class FW_API Process final
 {
     struct ProcData;
     ProcData *const d;

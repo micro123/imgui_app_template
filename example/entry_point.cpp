@@ -4,6 +4,7 @@
 #include <imgui.h>
 #include <implot.h>
 #include <utils/path_tools.hpp>
+#include "core/log.hpp"
 #include "imgui_widgets/calendar.hpp"
 
 extern void SomeCrashFunction();
@@ -115,5 +116,6 @@ protected:
 
 UniqueApp CreateApplication ()
 {
+    L_INFO("Application Creation!");
     return std::make_unique<MyApp> ();
 }

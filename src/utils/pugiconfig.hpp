@@ -36,7 +36,7 @@
 // #define PUGIXML_CLASS __declspec(dllimport) // to import all classes from DLL
 // #define PUGIXML_FUNCTION __fastcall // to set calling conventions to all public functions to fastcall
 // In absence of PUGIXML_CLASS/PUGIXML_FUNCTION definitions PUGIXML_API is used instead
-#define PUGIXML_API 
+#define PUGIXML_API FW_API
 
 // Tune these constants to adjust memory-related behavior
 // #define PUGIXML_MEMORY_PAGE_SIZE 32768

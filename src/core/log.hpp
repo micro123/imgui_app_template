@@ -47,7 +47,7 @@ extern "C"
  * @param ... arguments
  */
 
-void log_printf(const char *file, s32 line, s32 level, const char *msg, ...);
+void FW_API log_printf(const char *file, s32 line, s32 level, const char *msg, ...);
 
 #if LOG_LEVEL_DEFAULT <= LOG_LEVEL_TRACE
 #  define L_TRACE(MSG,...) do { log_printf(FILE_NAME_ONLY, __LINE__, LOG_LEVEL_TRACE, MSG, ##__VA_ARGS__); } while (0)

@@ -5,7 +5,7 @@
 #include "utils/singleton.hpp"
 #include "core/log.hpp"
 
-struct log_item {
+struct FW_API log_item {
     log_item();
 
     char datetime[32];
@@ -16,7 +16,7 @@ struct log_item {
     char payload[0];
 };
 
-class log_store final: public PublicSingleton<log_store> {
+class FW_API log_store final: public PublicSingleton<log_store> {
 public:
     class const_iter final {
     public:
