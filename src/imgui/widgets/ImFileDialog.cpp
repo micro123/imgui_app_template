@@ -575,7 +575,7 @@ namespace ImGui {
 
         if (isMe && m_isOpen) {
             if (!m_calledOpenPopup) {
-                ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_FirstUseEver);
+                ImGui::SetNextWindowSize(GetMainViewport ()->Size * 0.75f, ImGuiCond_FirstUseEver);
                 ImGui::OpenPopup(m_currentTitle.c_str());
                 m_calledOpenPopup = true;
             }

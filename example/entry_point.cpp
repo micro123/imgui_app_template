@@ -35,7 +35,7 @@ protected:
 
         CreateRootDockNode();
 
-        if (Begin ("First Window"))
+        if (Begin ("First Window", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
         {
             Text("Delta: %.3f", delta);
             Text("Total: %.3f", total);

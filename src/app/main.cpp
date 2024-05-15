@@ -9,7 +9,7 @@ ENTRY_DECL();
 
 int main_proc() {
     ENTRY_INIT();
-    std::unique_ptr<Application> app {CreateApplication()};
+    const std::unique_ptr<Application> app {CreateApplication()};
     app->Init();
     return app->Exec();
 }
