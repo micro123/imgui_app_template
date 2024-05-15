@@ -19,6 +19,7 @@ enum AppWindowFlag: u32 {
     AppWindowFlag_Frameless = 0x100,
     AppWindowFlag_Topmost = 0x200,
     AppWindowFlag_Opacity = 0x400,
+    AppWindowFlag_NoResize = 0x800,
 };
 
 extern int main_proc();

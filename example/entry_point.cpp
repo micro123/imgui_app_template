@@ -9,6 +9,7 @@
 #include "imgui/widgets/calendar.hpp"
 #include "imgui/widgets/sys_log_view.hpp"
 #include "imgui/widgets/texture.h"
+#include "imgui/widgets/imgui_notify.h"
 #include "imgui/utils/dock_helpers.hpp"
 
 extern void SomeCrashFunction();
@@ -16,7 +17,7 @@ extern void SomeCrashFunction();
 class MyApp final : public Application
 {
 public:
-    MyApp () : Application ("Hello World", 1280, 720, AppWindowFlag_Opacity) {}
+    MyApp () : Application ("Hello World", 1440, 900, AppWindowFlag_Topmost) {}
 
 protected:
     void BeforeMainLoop() override
@@ -101,6 +102,7 @@ protected:
                 if (FDLG.HasResult()) {
                     auto path = FDLG.GetResult().string();
                     some_pic.LoadFromFile(path.c_str());
+                    InsertNotification(ImGuiToast(ImGuiToastType_Info, "load image %s", path.c_str()));
                 }
                 FDLG.Close();
             }

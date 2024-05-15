@@ -75,6 +75,9 @@ Application::Application (const char *title, s32 width, s32 height, u32 awf)
     glfwWindowHint (GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint (GLFW_CONTEXT_VERSION_MINOR, 0);
 
+    // default is no resizable
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+
     GLFWmonitor *monitor      = nullptr;
     auto const   window_state = (awf & AppWindowFlag_StateMask);
     if (window_state == AppWindowFlag_Fullscreen)
@@ -87,6 +90,7 @@ Application::Application (const char *title, s32 width, s32 height, u32 awf)
     else if (window_state == AppWindowFlag_Maximum)
     {
         glfwWindowHint (GLFW_MAXIMIZED, GLFW_TRUE);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
     }
     else
     {
@@ -102,6 +106,10 @@ Application::Application (const char *title, s32 width, s32 height, u32 awf)
         if (awf & AppWindowFlag_Opacity)
         {
             glfwWindowHint (GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
+        }
+        if (!(awf & AppWindowFlag_NoResize))
+        {
+            glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
         }
     }
 
