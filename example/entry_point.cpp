@@ -150,8 +150,8 @@ private:
     Texture some_pic;
 };
 
-UniqueApp CreateApplication ()
+EntryPoint()
 {
     L_INFO("Application Creation!");
-    return std::make_unique<MyApp> ();
+    return new MyApp;
 }

@@ -5,6 +5,7 @@
 #include "fw_export.h"
 #include "imgui.h"
 #include "font_config.hpp"
+#include "core/log.hpp"
 
 #include <memory>
 
@@ -48,12 +49,24 @@ private:
     friend int main_proc();
 };
 
-using UniqueApp = std::unique_ptr<Application>;
-
 #define App (Application::Instance())
 
+using PFN_CreateApplication = Application*(*)();
+
 // Must Implement by user
+#if defined(_WIN32)
+extern  PFN_CreateApplication CreateApplication;
+#define EntryPoint() \
+extern "C" API_EXPORT Application* WIN_CreateApplication()
+#define ENTRY_DECL() PFN_CreateApplication CreateApplication
+#define ENTRY_INIT() do { *(void**)&CreateApplication = GetProcAddress(GetModuleHandleW(0), "WIN_CreateApplication"); LC_FATAL(CreateApplication == NULL, "unable to find entry symbol!"); } while(0)
+#else
 API_EXPORT
-UniqueApp CreateApplication();
+Application* CreateApplication();
+#define EntryPoint() \
+Application* CreateApplication()
+#define ENTRY_INIT() do {} while(0)
+#define ENTRY_DECL()
+#endif
 
 #endif /* APPLICATION_HPP */

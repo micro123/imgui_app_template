@@ -95,7 +95,7 @@ namespace ImGui {
 
     int BottomButtons(const std::initializer_list<const char*> &buttons)
     {
-        PI_ASSERT(!buttons.size());
+        FW_ASSERT(!buttons.size());
 
         auto const [maxX,maxY] = GetCurrentWindow()->Size;
         auto const [curX,curY] = GetCursorPos();

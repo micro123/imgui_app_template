@@ -8,14 +8,13 @@
 #include <algorithm>
 #include <sys/stat.h>
 
-#define IMGUI_DEFINE_MATH_OPERATORS
-
 #include <imgui.h>
 #include <imgui_internal.h>
 
 #define STB_IMAGE_IMPLEMENTATION
-
 #include "stb_image.h"
+
+#include "config.h"
 
 #ifdef _WIN32
 #include <windows.h>

@@ -4,7 +4,7 @@
 
 std::vector<std::string> split_string(const std::string &input, const std::string &spliter)
 {
-    PI_ASSERT(!spliter.empty());
+    FW_ASSERT(!spliter.empty());
     std::vector<std::string> result;
     
     std::string::size_type pos = 0, next = pos;

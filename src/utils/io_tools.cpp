@@ -31,12 +31,12 @@ std::string ReadTextFile(const std::string& path)
     if (auto hFile = OpenFileForRead(path); hFile != INVALID_HANDLE_VALUE) {
         LARGE_INTEGER move{ .QuadPart = 0 };
         LARGE_INTEGER pos{};
-        PI_ASSERT(SetFilePointerEx(hFile, move, &pos, FILE_END) == TRUE);
+        FW_ASSERT(SetFilePointerEx(hFile, move, &pos, FILE_END) == TRUE);
         move.QuadPart = -pos.QuadPart;
         text.resize(pos.QuadPart);
-        PI_ASSERT(SetFilePointerEx(hFile, move, &pos, FILE_CURRENT) == TRUE);
+        FW_ASSERT(SetFilePointerEx(hFile, move, &pos, FILE_CURRENT) == TRUE);
         DWORD readed;
-        PI_ASSERT(ReadFile(hFile, &text[0], -move.QuadPart, &readed, NULL) == TRUE);
+        FW_ASSERT(ReadFile(hFile, &text[0], -move.QuadPart, &readed, NULL) == TRUE);
         text.resize(readed);
         CloseHandle(hFile);
     }
@@ -53,12 +53,12 @@ std::vector<u8> ReadBinaryFile(const std::string& path)
     if (auto hFile = OpenFileForRead(path); hFile != INVALID_HANDLE_VALUE) {
         LARGE_INTEGER move{ .QuadPart = 0 };
         LARGE_INTEGER pos{};
-        PI_ASSERT(SetFilePointerEx(hFile, move, &pos, FILE_END) == TRUE);
+        FW_ASSERT(SetFilePointerEx(hFile, move, &pos, FILE_END) == TRUE);
         move.QuadPart = -pos.QuadPart;
         content.resize(pos.QuadPart);
-        PI_ASSERT(SetFilePointerEx(hFile, move, &pos, FILE_CURRENT) == TRUE);
+        FW_ASSERT(SetFilePointerEx(hFile, move, &pos, FILE_CURRENT) == TRUE);
         DWORD readed;
-        PI_ASSERT(ReadFile(hFile, &content[0], -move.QuadPart, &readed, NULL) == TRUE);
+        FW_ASSERT(ReadFile(hFile, &content[0], -move.QuadPart, &readed, NULL) == TRUE);
         content.resize(readed);
         CloseHandle(hFile);
     }

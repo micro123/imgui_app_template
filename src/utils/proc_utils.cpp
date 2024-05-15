@@ -242,7 +242,7 @@ bool Process::IsRunning ()
 
 bool Process::ProcData::Start ()
 {
-    PI_ASSERT_MSG (started.load () == false, "Process Already Started!");
+    FW_ASSERT_MSG (started.load () == false, "Process Already Started!");
 #if _WIN32
     pi             = start_process (program, arguments, false);
     return started = (pi.dwProcessId > 0);
@@ -262,7 +262,7 @@ bool Process::ProcData::Start ()
 
 bool Process::ProcData::Stop ()
 {
-    PI_ASSERT_MSG (started.load () == true, "Process Not Started!");
+    FW_ASSERT_MSG (started.load () == true, "Process Not Started!");
 #if _WIN32
     BOOL r = TerminateProcess (pi.hProcess, 0);
     if (!r)
