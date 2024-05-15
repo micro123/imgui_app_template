@@ -5,7 +5,9 @@
 #include <implot.h>
 #include <utils/path_tools.hpp>
 #include "core/log.hpp"
-#include "imgui_widgets/calendar.hpp"
+#include "imgui/widgets/calendar.hpp"
+#include "imgui/widgets/sys_log_view.hpp"
+#include "imgui/utils/dock_helpers.hpp"
 
 extern void SomeCrashFunction();
 
@@ -22,6 +24,8 @@ protected:
         static bool demo_imgui  = false;
         static bool demo_implot = false;
         static float rgba[4] {0,0,0,1};
+
+        CreateRootDockNode();
 
         if (Begin ("First Window"))
         {
@@ -85,6 +89,9 @@ protected:
             ImGui::ShowDemoWindow (&demo_imgui);
         if (demo_implot)
             ImPlot::ShowDemoWindow (&demo_implot);
+
+        static SysLogView view("System Log");
+        view.Show();
     }
 
     std::vector<FontCfg> GetFontConfigs (ImGuiIO &io) override

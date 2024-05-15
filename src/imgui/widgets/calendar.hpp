@@ -4,7 +4,7 @@
 #include <imgui.h>
 #include <string>
 
-struct Date {
+struct IMGUI_API Date {
     int year;
     int month;
     int day;
@@ -14,7 +14,7 @@ struct Date {
     static Date Current();
 };
 
-class DateEditor {
+class IMGUI_API DateEditor {
     struct DateGrid
     {
         int year, month, day, flags;
