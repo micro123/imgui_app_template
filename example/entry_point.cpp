@@ -5,8 +5,10 @@
 #include <implot.h>
 #include <utils/path_tools.hpp>
 #include "core/log.hpp"
+#include "imgui/widgets/ImFileDialog.h"
 #include "imgui/widgets/calendar.hpp"
 #include "imgui/widgets/sys_log_view.hpp"
+#include "imgui/widgets/texture.h"
 #include "imgui/utils/dock_helpers.hpp"
 
 extern void SomeCrashFunction();
@@ -17,6 +19,11 @@ public:
     MyApp () : Application ("Hello World", 1280, 720, AppWindowFlag_Opacity) {}
 
 protected:
+    void BeforeMainLoop() override
+    {
+        some_pic.LoadFromAsset("images/smile.png");
+    }
+
     void Update (double delta, double total) override
     {
         using namespace ImGui;
@@ -82,6 +89,21 @@ protected:
             if (editor_child.RenderAsChild())
                 date_text2 = editor_child.GetSelectedDate();
 
+            Separator();
+            Text("Image %dx%d", some_pic.Width(), some_pic.Height());
+            SameLine();
+            if (Button("选择文件")) {
+                FDLG.Open("SelectImage", "选择图片", "Image Files {.jpg,.png}");
+            }
+            Image(some_pic, ImVec2(.25f,.25f));
+
+            if (FDLG.IsDone("SelectImage")) {
+                if (FDLG.HasResult()) {
+                    auto path = FDLG.GetResult().string();
+                    some_pic.LoadFromFile(path.c_str());
+                }
+                FDLG.Close();
+            }
         }
         End();
 
@@ -91,6 +113,8 @@ protected:
             ImPlot::ShowDemoWindow (&demo_implot);
 
         static SysLogView view("System Log");
+        
+        SetNextWindowSize(ImVec2(600, 250));
         view.Show();
     }
 
@@ -119,6 +143,9 @@ protected:
 
         return fonts;
     }
+
+private:
+    Texture some_pic;
 };
 
 UniqueApp CreateApplication ()

@@ -1,4 +1,5 @@
 #include "application.hpp"
+#include "imgui/utils/glad.h"
 #include <GLFW/glfw3.h>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
@@ -6,6 +7,9 @@
 #include <implot.h>
 #include <misc/freetype/imgui_freetype.h>
 #include "core/log.hpp"
+#include "imgui/widgets/imgui_notify.h"
+#include "imgui/widgets/ImFileDialog.h"
+#include "imgui/utils/gl_utils.hpp"
 
 namespace
 {
@@ -109,6 +113,9 @@ Application::Application (const char *title, s32 width, s32 height, u32 awf)
 
     glfwMakeContextCurrent (wnd);
     glfwSwapInterval (1);  // enable v-sync
+
+    gladLoadGLLoader ((GLADloadproc) &glfwGetProcAddress);
+    L_INFO ("Using OpenGL: %s", glGetString (GL_VERSION));
 }
 
 void Application::ConfigImGui (ImGuiIO &io)
@@ -243,6 +250,27 @@ void Application::Init ()
     L_INFO ("Preparing Load Fonts.");
     auto fonts = GetFontConfigs (io);
     LoadFonts (fonts, io);
+
+    // initial ImGuiFileDialog
+    ImGui::FileDialog::Instance ().CreateTexture = [] (uint8_t *data, int w, int h, char fmt) -> void * {
+        GLuint tex;
+
+        GL_CALL (glGenTextures (1, &tex));
+        GL_CALL (glBindTexture (GL_TEXTURE_2D, tex));
+        GL_CALL (glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+        GL_CALL (glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+        GL_CALL (glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+        GL_CALL (glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+        GL_CALL (glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, (fmt == 0) ? GL_BGRA : GL_RGBA, GL_UNSIGNED_BYTE, data));
+        //        glGenerateMipmap(GL_TEXTURE_2D);
+        GL_CALL (glBindTexture (GL_TEXTURE_2D, 0));
+
+        return (void *) (uintptr_t) tex;
+    };
+    ImGui::FileDialog::Instance ().DeleteTexture = [] (void *tex) {
+        GLuint texID = (GLuint) ((uintptr_t) tex);
+        GL_CALL (glDeleteTextures (1, &texID));
+    };
 }
 
 int Application::Exec ()
@@ -276,6 +304,9 @@ int Application::Exec ()
 
         // User Content
         Update (delta_time, total_time);
+
+        // ImGui Notify
+        ImGui::RenderNotifications();
 
         // render
         ImGui::Render ();
