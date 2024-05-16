@@ -10,6 +10,7 @@
 #include "imgui/widgets/imgui_notify.h"
 #include "imgui/widgets/ImFileDialog.h"
 #include "imgui/utils/gl_utils.hpp"
+#include "utils/path_tools.hpp"
 
 namespace
 {
@@ -287,6 +288,10 @@ int Application::Exec ()
     double const started     = glfwGetTime ();
     double       last_update = started;
 
+    // IMGUI: Load Settings
+    const std::string imgui_ini_file = GetDataPath("imgui.ini");
+    ImGui::LoadIniSettingsFromDisk(imgui_ini_file.c_str());
+
     // User: Post Loop
     L_INFO ("User Init Process...");
     BeforeMainLoop ();
@@ -341,6 +346,9 @@ int Application::Exec ()
     // User: End Loop
     L_INFO ("User Cleanup Process.");
     AfterMainLoop ();
+
+    // IMGUI: Save Settings
+    ImGui::SaveIniSettingsToDisk(imgui_ini_file.c_str());
 
     return exit_code;
 }

@@ -47,7 +47,7 @@ std::vector<unsigned char> asset_content(const char *asset_id)
         content.resize(length);
         lseek64(fd, 0, SEEK_SET);
         auto read_len = read(fd, content.data(), content.size());
-        PI_ASSERT((size_t)read_len == content.size());
+        FW_ASSERT((size_t)read_len == content.size());
         close(fd);
     }
     else

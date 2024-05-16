@@ -24,7 +24,7 @@ protected:
     {
         some_pic.LoadFromAsset("images/smile.png");
     }
-
+    
     void Update (double delta, double total) override
     {
         using namespace ImGui;

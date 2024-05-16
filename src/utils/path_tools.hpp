@@ -10,6 +10,11 @@
 #include <string>
 
 /**
+ * 获取EXE/ELF文件名，不包含后缀
+ */
+FW_API std::string_view GetAppExecutableName();
+
+/**
  * 获取EXE/ELF文件完整路径
  */
 FW_API std::string_view GetAppExecutablePath();

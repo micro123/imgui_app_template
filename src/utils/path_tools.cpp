@@ -223,3 +223,8 @@ std::string GetTempFilePath(const char *relPath)
 {
     return fmt::format("{}" PATH_SEPARATOR "{}", GetTempDirPath(), relPath);
 }
+
+std::string_view GetAppExecutableName()
+{
+    return GetExecutableFileName();
+}

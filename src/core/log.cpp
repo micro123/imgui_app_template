@@ -8,8 +8,11 @@
 #include <cstdarg>
 #include <cstdio>
 #include <ctime>
+#include <string>
 #include <utils/path_tools.hpp>
 #include <core/log_store.hpp>
+#include "fmt/format.h"
+#include "fmt/chrono.h"
 
 static constexpr const int MAX_THREAD_ID_LEN = 10;
 
@@ -19,6 +22,8 @@ static u32                         format_thread_id (char (&buff)[MAX_THREAD_ID_
 static constexpr const char *const level_text[] = {"T", "D", "I", "W", "E", "F"};
 
 static_assert (std::size (level_text) == LOG_LEVEL_FATAL + 1);
+
+static std::string GetLogFileName();
 
 #if defined(_WIN32)
 #include <Windows.h>
@@ -47,12 +52,13 @@ void log_vaprintf (s32 level, const char *fmt, va_list args)
         guard_tool()
         {
             InitializeCriticalSection(&cs);
-            time_t rawtime;
-            time(&rawtime);
-            const auto timeinfo = localtime(&rawtime);
-            char       log_name[64];
-            strftime(log_name, sizeof(log_name), "PiInfoApp_%Y_%m_%d.log.txt", timeinfo);
-            std::wstring full_path_wide = fromUtf8(GetDataPath(log_name));
+            // time_t rawtime;
+            // time(&rawtime);
+            // const auto timeinfo = localtime(&rawtime);
+            // char       log_name[64];
+            // strftime(log_name, sizeof(log_name), "PiInfoApp_%Y_%m_%d.log.txt", timeinfo);
+            std::string log_file_name = GetLogFileName();
+            std::wstring full_path_wide = fromUtf8(GetDataPath(log_file_name.c_str()));
             hLogFile = CreateFileW(full_path_wide.c_str(),
                 GENERIC_WRITE,
                 FILE_SHARE_READ,
@@ -125,12 +131,15 @@ void log_vaprintf (s32 level, const char *fmt, va_list args)
         guard_tool ()
         {
             pthread_mutex_init (&lck, nullptr);
-            time_t rawtime;
-            time (&rawtime);
-            const auto timeinfo = localtime (&rawtime);
-            char       log_name[64];
-            strftime (log_name, sizeof (log_name), "PiInfoApp_%Y_%m_%d.log.txt", timeinfo);
-            std::string full_path = GetDataPath (log_name);
+            // time_t rawtime;
+            // time (&rawtime);
+            // const auto timeinfo = localtime (&rawtime);
+            // char       log_name[64];
+            // char       log_name_pattern[64];
+            // snprintf(log_name_pattern, sizeof(log_name_pattern), "%s_%%Y_%%m_%%d.log", GetAppExecutablePath())
+            // strftime (log_name, sizeof (log_name), "PiInfoApp_%Y_%m_%d.log.txt", timeinfo);
+            std::string log_file_name = GetLogFileName();
+            std::string full_path = GetDataPath (log_file_name.c_str());
             log_fd                = open (full_path.c_str (), O_WRONLY | O_CREAT | O_APPEND, 0666);
         }
         ~guard_tool ()
@@ -221,4 +230,10 @@ void log_printf (const char *file, s32 line, s32 level, const char *msg, ...)
     va_start (args, msg);
     log_vaprintf (level, msg_buffer, args);
     va_end (args);
+}
+
+std::string GetLogFileName()
+{
+    std::string prefix = GetAppExecutableName().data();
+    return fmt::format("{}_{:%Y_%m_%d}.log.txt", prefix, fmt::localtime(std::time(nullptr)));
 }
