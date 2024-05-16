@@ -22,7 +22,7 @@ static void WStringToUtf8String(const WCHAR* in, char* out, size_t buff_len)
     WideCharToMultiByte(CP_UTF8, 0, in, -1, out, buff_len, NULL, NULL);
 }
 
-static const WCHAR* GetExecutableFileName()
+static const WCHAR* GetExecutableFileNameW()
 {
     static WCHAR NameBuffer[MAX_PATH]{ 0 };
     static const WCHAR* NamePtr = NULL;
@@ -35,11 +35,24 @@ static const WCHAR* GetExecutableFileName()
     return NamePtr;
 }
 
+static const char* GetExecutableFileName()
+{
+    static char NameBuffer[MAX_PATH]{ 0 };
+    static const char* NamePtr = NULL;
+    if (NamePtr == NULL)
+    {
+        GetModuleFileNameA(NULL, NameBuffer, MAX_PATH);
+        PathRemoveExtensionA(NameBuffer);
+        NamePtr = PathFindFileNameA(NameBuffer);
+    }
+    return NamePtr;
+}
+
 void GetDataDirPathImpl(char* out_path, size_t path_len)
 {
     WCHAR wpath[MAX_PATH]{ 0 };
     SHGetFolderPathW(NULL, CSIDL_APPDATA, NULL, 0, wpath);
-    PathAppendW(wpath, GetExecutableFileName());
+    PathAppendW(wpath, GetExecutableFileNameW());
     if (!PathIsDirectoryW(wpath))
     {
         CreateDirectoryW(wpath, NULL);
