@@ -85,5 +85,9 @@ add_subdirectory(src)
 # resources
 add_subdirectory(resources)
 
-# example
-add_subdirectory(example)
+string(COMPARE EQUAL "${CMAKE_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}" FW_STANDALONE)
+if (FW_STANDALONE)
+  # example
+  message(STATUS "Example will be build!")
+  add_subdirectory(example)
+endif()

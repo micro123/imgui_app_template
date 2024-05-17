@@ -219,7 +219,7 @@ namespace ImGui {
                             newPath += "/";
 #endif
                     }
-                    path = std::filesystem::u8path(newPath);
+                    path = std::filesystem::path((const char8_t*)newPath.data());
                     ret = true;
                 }
                 anyOtherHC |= (ImGui::IsItemHovered() || ImGui::IsItemClicked());
@@ -264,7 +264,7 @@ namespace ImGui {
                                    ImGuiInputTextFlags_EnterReturnsTrue)) {
                 std::string tempStr(pathBuffer);
                 if (std::filesystem::exists(tempStr))
-                    path = std::filesystem::u8path(tempStr);
+                    path = std::filesystem::path((const char8_t*)tempStr.data());
                 ret = true;
             }
             if (!skipActiveCheck && !ImGui::IsItemActive())
@@ -537,7 +537,7 @@ namespace ImGui {
 
         m_parseFilter(filter);
         if (!startingDir.empty())
-            m_setDirectory(std::filesystem::u8path(startingDir), false);
+            m_setDirectory(std::filesystem::path((const char8_t*)startingDir.data()), false);
         else
             m_setDirectory(m_currentDirectory, false); // refresh contents
 
@@ -563,7 +563,7 @@ namespace ImGui {
 
         m_parseFilter(filter);
         if (!startingDir.empty())
-            m_setDirectory(std::filesystem::u8path(startingDir), false);
+            m_setDirectory(std::filesystem::path((const char8_t*)startingDir.data()), false);
         else
             m_setDirectory(m_currentDirectory, false); // refresh contents
 
@@ -632,7 +632,7 @@ namespace ImGui {
         if (std::count(m_favorites.begin(), m_favorites.end(), path) > 0)
             return;
 
-        if (!std::filesystem::exists(std::filesystem::u8path(path)))
+        if (!std::filesystem::exists(std::filesystem::path((const char8_t*)path.data())))
             return;
 
         m_favorites.push_back(path);
@@ -683,7 +683,7 @@ namespace ImGui {
 
         if (hasResult) {
             if (!m_isMultiselect || m_selections.size() <= 1) {
-                std::filesystem::path path = std::filesystem::u8path(filename);
+                std::filesystem::path path = std::filesystem::path((const char8_t*)filename.data());
                 if (path.is_absolute()) m_result.push_back(path);
                 else m_result.push_back(m_currentDirectory / path);
                 if (m_type == IFD_DIALOG_DIRECTORY || m_type == IFD_DIALOG_FILE) {
