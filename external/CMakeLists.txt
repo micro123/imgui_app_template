@@ -67,4 +67,9 @@ add_subdirectory(fmt)
 # cpr
 set(CPR_USE_SYSTEM_CURL ON)
 set(CPR_ENABLE_CURL_HTTP_ONLY OFF)
+
+if (WIN32)
+  set(CPR_USE_SYSTEM_CURL OFF)
+endif()
+
 add_subdirectory(cpr)

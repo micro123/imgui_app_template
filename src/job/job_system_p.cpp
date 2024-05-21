@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <thread>
+#include <mutex>
 #include "core/log.hpp"
 #include "job_system.hpp"
 
