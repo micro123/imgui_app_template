@@ -43,7 +43,7 @@ See `src/entry_point.cpp`, just implement all the functions which declared in fi
 
 - [x] Windows MSVC Support
 - [x] Convert to OOP-Style
-- [x] And may convert an shared library?
+- [x] And may convert to a shared library?
 
 
 ## Credists

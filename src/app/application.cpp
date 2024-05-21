@@ -11,6 +11,7 @@
 #include "imgui/widgets/ImFileDialog.h"
 #include "imgui/utils/gl_utils.hpp"
 #include "utils/path_tools.hpp"
+#include "job/job_system_p.hpp"
 
 namespace
 {
@@ -280,6 +281,9 @@ void Application::Init ()
         GLuint texID = (GLuint) ((uintptr_t) tex);
         GL_CALL (glDeleteTextures (1, &texID));
     };
+    
+    // init job system
+    js_init();
 }
 
 int Application::Exec ()
@@ -355,6 +359,9 @@ int Application::Exec ()
 
 Application::~Application ()
 {
+    // job system exit
+    js_terminate();
+
     // cleanup
     L_INFO ("Cleanup.");
     ImGui_ImplOpenGL3_Shutdown ();

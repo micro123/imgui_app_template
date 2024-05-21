@@ -9,7 +9,7 @@ else()
   add_library(${PROJECT_NAME} STATIC ${FK_SRCS})
   target_compile_definitions(${PROJECT_NAME} PRIVATE -DFW_STATIC)
 endif()
-target_link_libraries(${PROJECT_NAME} PRIVATE glfw OpenGL::GL)
+target_link_libraries(${PROJECT_NAME} PRIVATE glfw OpenGL::GL cpr::cpr)
 target_link_libraries(${PROJECT_NAME} PUBLIC ImGui ImPlot fmt)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 

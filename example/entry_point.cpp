@@ -11,8 +11,10 @@
 #include "imgui/widgets/texture.h"
 #include "imgui/widgets/imgui_notify.h"
 #include "imgui/utils/dock_helpers.hpp"
+#include "job/job_system.hpp"
 
 extern void SomeCrashFunction();
+extern void TestHttpGet();
 
 class MyApp final : public Application
 {
@@ -61,6 +63,15 @@ protected:
             {
                 App->Exit(1);
             }
+
+            Separator();
+            if (Button("TestHttpGet")) {
+                submit_job(create_job(TestHttpGet));
+            }
+
+            Separator();
+            static char some_str[128] {};
+            InputText("请输入一些东西", some_str, sizeof(some_str));
         }
         End ();
 
