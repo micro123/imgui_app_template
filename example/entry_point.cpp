@@ -19,7 +19,7 @@ extern void TestHttpGet();
 class MyApp final : public Application
 {
 public:
-    MyApp () : Application ("Hello World", 1440, 900, AppWindowFlag_Topmost) {}
+    MyApp () : Application ("Hello World", 1920, 1080, AppWindowFlag_NoResize | AppWindowFlag_Frameless) {}
 
 protected:
     void BeforeMainLoop() override
