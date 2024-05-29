@@ -4,6 +4,7 @@
 #include <imgui.h>
 #include <implot.h>
 #include <utils/path_tools.hpp>
+#include <vector>
 #include "core/log.hpp"
 #include "imgui/widgets/ImFileDialog.h"
 #include "imgui/widgets/calendar.hpp"
@@ -13,11 +14,14 @@
 #include "imgui/utils/dock_helpers.hpp"
 #include "job/job_system.hpp"
 
+#include "pages/page_base.hpp"
+
 extern void SomeCrashFunction();
 extern void TestHttpGet();
 
 class MyApp final : public Application
 {
+    using PagePtr = std::unique_ptr<Page>;
 public:
     MyApp () : Application ("Hello World", 1920, 1080, AppWindowFlag_NoResize | AppWindowFlag_Frameless) {}
 
@@ -25,6 +29,12 @@ protected:
     void BeforeMainLoop() override
     {
         some_pic.LoadFromAsset("images/smile.png");
+
+        auto const cnt = PageRegistry::PageCount();
+        pages.reserve(cnt);
+        for (int i=0; i<cnt; ++i) {
+            pages.emplace_back(PageRegistry::Get(i))->OnStart();
+        }
     }
     
     void Update (double delta, double total) override
@@ -36,7 +46,7 @@ protected:
         static float rgba[4] {0,0,0,1};
 
         CreateRootDockNode();
-
+        
         if (Begin ("First Window", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
         {
             Text("Delta: %.3f", delta);
@@ -59,6 +69,7 @@ protected:
             {
                 SomeCrashFunction ();
             }
+            SetNextItemShortcut(ImGuiKey_ModCtrl | ImGuiKey_Q);
             if (Button("Quit"))
             {
                 App->Exit(1);
@@ -129,6 +140,25 @@ protected:
         
         SetNextWindowSize(ImVec2(600, 250));
         view.Show();
+        
+        // SetNextWindowPos(GetMainViewport()->WorkPos, ImGuiCond_Always);
+        // SetNextWindowSize(GetMainViewport()->WorkSize, ImGuiCond_Always);
+        if (Begin("页面集合", nullptr, ImGuiWindowFlags_NoDecoration))
+        {
+            if (BeginTabBar("##PageTabBar")) {
+                for (auto &x: pages)
+                {
+                    if (BeginTabItem(x->Name(), nullptr))
+                    {
+                        x->OnFrame(delta, total);
+                        EndTabItem();
+                    }
+                }
+                EndTabBar();
+            }
+        }
+        End();
+
     }
 
     std::vector<FontCfg> GetFontConfigs (ImGuiIO &io) override
@@ -157,8 +187,15 @@ protected:
         return fonts;
     }
 
+    void AfterMainLoop() override {
+        for (auto &x: pages)
+            x->OnStop();
+        pages.clear();
+    }
+
 private:
     Texture some_pic;
+    std::vector<PagePtr> pages;
 };
 
 EntryPoint()

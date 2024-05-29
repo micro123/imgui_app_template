@@ -10,7 +10,7 @@ else()
   target_compile_definitions(${PROJECT_NAME} PRIVATE -DFW_STATIC)
 endif()
 target_link_libraries(${PROJECT_NAME} PRIVATE glfw OpenGL::GL cpr::cpr)
-target_link_libraries(${PROJECT_NAME} PUBLIC ImGui ImPlot fmt)
+target_link_libraries(${PROJECT_NAME} PUBLIC ImGui ImPlot ImNodeEd fmt)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # make tree

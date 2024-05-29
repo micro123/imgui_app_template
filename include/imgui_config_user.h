@@ -29,6 +29,7 @@
 //#define IMGUI_API __declspec( dllimport )
 #define IMGUI_API FW_API
 #define IMPLOT_API FW_API
+#define IMGUI_NODE_EDITOR_API FW_API
 
 //---- Don't define obsolete functions/enums/behaviors. Consider enabling from time to time after updating to clean your code of obsolete function/names.
 //#define IMGUI_DISABLE_OBSOLETE_FUNCTIONS
