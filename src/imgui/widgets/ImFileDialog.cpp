@@ -1296,7 +1296,7 @@ namespace ImGui {
                 bool isSelected = std::count(m_selections.begin(), m_selections.end(), entry.Path);
 
                 if (FileIcon(filename.c_str(), isSelected,
-                             entry.HasIconPreview ? entry.IconPreview : (ImTextureID) m_getIcon(entry.Path),
+                             entry.HasIconPreview ? (ImTextureID) entry.IconPreview : (ImTextureID) m_getIcon(entry.Path),
                              ImVec2(32 + 16 * m_zoom, 32 + 16 * m_zoom), entry.HasIconPreview, entry.IconPreviewWidth,
                              entry.IconPreviewHeight)) {
                     std::error_code ec;
@@ -1534,9 +1534,9 @@ namespace ImGui {
                 m_finalize();
         }
 
-        int escapeKey = ImGui::GetIO().KeyMap[ImGuiKey_Escape];
+        // int escapeKey = ImGui::GetIO().KeyMap[ImGuiKey_Escape];
         if (ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) &&
-            escapeKey >= 0 && ImGui::IsKeyPressed((ImGuiKey)escapeKey, false))
+            ImGui::IsKeyPressed((ImGuiKey)ImGuiKey_Escape, false))
             m_isOpen = false;
     }
 
