@@ -61,28 +61,6 @@ source_group(
   FILES ${IMPLOT_FILES}
 )
 
-# imgui-node-editor
-set(
-  IM_NODE_ED_FILES
-  imgui-node-editor
-  imgui-node-editor/imgui_node_editor.h
-  imgui-node-editor/imgui_node_editor.cpp
-  imgui-node-editor/imgui_node_editor_internal.inl
-  imgui-node-editor/imgui_node_editor_internal.h
-  imgui-node-editor/imgui_node_editor_api.cpp
-  imgui-node-editor/imgui_extra_math.inl
-  imgui-node-editor/imgui_extra_math.h
-  imgui-node-editor/imgui_canvas.h
-  imgui-node-editor/imgui_canvas.cpp
-  imgui-node-editor/imgui_bezier_math.inl
-  imgui-node-editor/imgui_bezier_math.h
-  imgui-node-editor/crude_json.h
-  imgui-node-editor/crude_json.cpp
-)
-add_library(ImNodeEd OBJECT ${IM_NODE_ED_FILES})
-target_include_directories(ImNodeEd PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/imgui-node-editor)
-target_link_libraries(ImNodeEd PUBLIC ImGui)
-
 # fmt
 add_subdirectory(fmt)
 

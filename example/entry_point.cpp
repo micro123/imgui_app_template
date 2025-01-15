@@ -23,7 +23,7 @@ class MyApp final : public Application
 {
     using PagePtr = std::unique_ptr<Page>;
 public:
-    MyApp () : Application ("Hello World", 1920, 1080, AppWindowFlag_NoResize | AppWindowFlag_Frameless) {}
+    MyApp () : Application ("Hello World", 1920, 1080, AppWindowFlag_NoResize) {}
 
 protected:
     void BeforeMainLoop() override
